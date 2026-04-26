@@ -88,11 +88,16 @@
         #admin-panel input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
         #admin-panel button { background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; }
 
-        /* COMMERCIAL BREAK SCREEN */
+        /* COMMERCIAL BREAK SCREEN (BOT BYPASS STEALTH MODE) */
         #ad-screen {
             flex-direction: column; justify-content: center; align-items: center; 
-            background: #000; z-index: 9500; position: fixed; top: 0; left: 0; 
+            background: #000; position: fixed; top: 0; left: 0; 
             width: 100%; height: 100%;
+            /* Bot Bypass Magic: Keep it rendered, but push it behind the app */
+            display: flex;
+            z-index: -100;
+            opacity: 0.01;
+            pointer-events: none;
         }
 
         /* CUSTOM MEDIA PLAYER INTERFACE */
@@ -250,7 +255,7 @@
         <div id="channels-grid"></div>
     </div>
 
-    <div id="ad-screen" class="app-screen">
+    <div id="ad-screen">
         <div style="width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; position: absolute; top: 0; box-sizing: border-box;">
             <span style="color: #ffcc00; font-weight: bold; font-size: 1.1em;">Sponsor Message</span>
             <span id="ad-timer" style="color: #00d2ff; font-weight: bold; font-size: 1.1em;">Loading in 7s...</span>
@@ -316,6 +321,7 @@
     <script>
         const GITHUB_USERNAME = "FreeLiveTvTelugu"; 
         const GITHUB_REPO = "Freelivetvtelugu";         
+        // REMOVED FOR SECURITY. The app will securely ask for it when you use the Admin Panel!
         const GITHUB_TOKEN = ""; 
         const FILE_PATH = "config.json";
         
@@ -324,6 +330,7 @@
         let allChannels = [];
         let isChannelsReady = false; 
         let adCountdownInterval;
+        let globalSearchTag = ""; // Will hold your tag from GitHub config.json
 
         // CRISP WHITE SVG ICONS
         const SVG_PLAY = '<svg viewBox="0 0 24 24" width="36" height="36"><path fill="white" d="M8 5v14l11-7z"/></svg>';
@@ -380,6 +387,10 @@
                 const data = await response.json();
                 const content = decodeURIComponent(escape(atob(data.content)));
                 const config = JSON.parse(content);
+                
+                // Read the search tag directly from your config.json!
+                globalSearchTag = config.searchTarget ? config.searchTarget.toUpperCase() : "";
+                
                 await fetchAndParseM3U(config.playlistUrl);
             } catch (error) {
                 document.getElementById('loading-text').innerText = "Cloud Connection Failed.";
@@ -439,13 +450,19 @@
             const grid = document.getElementById('channels-grid');
             grid.innerHTML = '';
             
-            let filteredChannels = allChannels.filter(ch => {
-                const groupName = ch.group.toUpperCase();
-                return groupName.includes("TELUGU") || groupName.includes("TELEGU");
-            });
+            // Filter using YOUR custom tag from GitHub config.json
+            let filteredChannels = allChannels;
+            if (globalSearchTag !== "") {
+                filteredChannels = allChannels.filter(ch => {
+                    const groupName = ch.group.toUpperCase();
+                    const rawName = ch.rawName.toUpperCase();
+                    return groupName.includes(globalSearchTag) || rawName.includes(globalSearchTag);
+                });
+            }
 
             if (filteredChannels.length === 0) {
-                document.getElementById('loading-text').innerText = `No Telugu categories found.`;
+                document.getElementById('loading-text').innerText = `No channels found for tag: ${globalSearchTag}`;
+                document.getElementById('loading-text').style.display = 'block';
                 return;
             }
 
@@ -472,16 +489,59 @@
         }
 
         // ==========================================
-        // MONETIZATION (AD ENGINE)
+        // GHOST ADMIN SECURE UPDATER
+        // ==========================================
+        async function updateGitHubFile() {
+            const newUrl = document.getElementById('new-m3u-url').value;
+            const statusText = document.getElementById('admin-status');
+            if (!newUrl) return;
+
+            // Security Fix: Ask for the token securely!
+            const secureToken = prompt("Enter your GitHub Admin Token (ghp_...):");
+            if (!secureToken) return;
+
+            statusText.innerText = "Connecting...";
+            const url = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${FILE_PATH}`;
+            
+            try {
+                const getRes = await fetch(url, { headers: { 'Authorization': `token ${secureToken}` } });
+                const getJson = await getRes.json();
+                
+                // Preserves your search target and updates the URL
+                const newConfig = { "playlistUrl": newUrl, "searchTarget": globalSearchTag };
+                const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(newConfig, null, 2))));
+
+                const pushRes = await fetch(url, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `token ${secureToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: "Admin Update", content: contentEncoded, sha: getJson.sha })
+                });
+
+                if (pushRes.ok) {
+                    statusText.style.color = "lightgreen";
+                    statusText.innerText = "SUCCESS! Restarting...";
+                    setTimeout(() => location.reload(), 2000);
+                }
+            } catch (error) {
+                statusText.style.color = "red";
+                statusText.innerText = "Error updating GitHub.";
+            }
+        }
+
+        // ==========================================
+        // MONETIZATION (AD ENGINE STEALTH BYPASS)
         // ==========================================
         function playAdBeforeStream(channelName, streamUrl) {
             // Hide the main screen
             document.getElementById('main-screen').style.display = 'none';
             
-            // Show the Ad screen
             const adScreen = document.getElementById('ad-screen');
             const adTimerText = document.getElementById('ad-timer');
-            adScreen.style.display = 'flex';
+            
+            // BRING AD TO THE FRONT!
+            adScreen.style.zIndex = "9500";
+            adScreen.style.opacity = "1";
+            adScreen.style.pointerEvents = "auto";
             
             let timeLeft = 7;
             adTimerText.innerText = `Loading in ${timeLeft}s...`;
@@ -493,7 +553,12 @@
                     adTimerText.innerText = `Loading in ${timeLeft}s...`;
                 } else {
                     clearInterval(adCountdownInterval);
-                    adScreen.style.display = 'none'; // Hide the ad
+                    
+                    // PUSH AD BACK TO THE SHADOWS
+                    adScreen.style.zIndex = "-100";
+                    adScreen.style.opacity = "0.01";
+                    adScreen.style.pointerEvents = "none";
+                    
                     openPlayer(channelName, streamUrl); // Start the video
                 }
             }, 1000);
@@ -621,7 +686,6 @@
         }
 
         async function openPlayer(channelName, streamUrl) {
-            // (Note: we no longer hide main-screen here because the ad engine already did it)
             document.getElementById('player-screen').style.display = 'flex';
             document.getElementById('now-playing-title').innerText = channelName;
             playBtn.innerHTML = SVG_PLAY; 
@@ -767,4 +831,4 @@
 
     </script>
 </body>
-                        </html>
+</html>
