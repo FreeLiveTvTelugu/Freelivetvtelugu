@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <meta name="a-ads-verify" content="PASTE_YOUR_SECRET_CODE_HERE">
-    
     <title>FL Tv Telugu</title>
     
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.min.js"></script>
 
     <style>
-        /* GLOBAL SECURITY & STYLING */
+        /* ==========================================
+           GLOBAL SECURITY & STYLING
+           ========================================== */
         body {
             margin: 0; padding: 0; background-color: #121212; color: white;
             font-family: Arial, sans-serif; overflow-x: hidden;
@@ -21,15 +20,28 @@
         input { user-select: auto; -webkit-user-select: auto; }
         .app-screen { display: none; width: 100%; min-height: 100vh; }
 
-        /* Disable Native Mobile Video Controls */
         video::-webkit-media-controls { display: none !important; }
 
-        /* ANDROID TV NAVIGATION (THE GLOW EFFECT) */
         :focus {
-            outline: none !important; border-color: #00d2ff !important;
-            box-shadow: 0 0 20px #00d2ff !important; transform: scale(1.05);
-            transition: all 0.2s ease; z-index: 50;
+            outline: none !important;
+            border-color: #00d2ff !important;
+            box-shadow: 0 0 20px #00d2ff !important;
+            transform: scale(1.05);
+            transition: all 0.2s ease;
+            z-index: 50;
         }
+
+        /* ==========================================
+           VERIFICATION STARTUP AD SCREEN
+           ========================================== */
+        #startup-ad-screen {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background-color: #0a0a0a; position: fixed; top: 0; left: 0; z-index: 99999;
+            width: 100%; height: 100%;
+        }
+        #startup-ad-screen h2 { color: #ffcc00; margin-bottom: 20px; text-align: center; font-size: 1.5em; }
+        .startup-timer-text { color: #aaaaaa; font-size: 16px; margin-top: 20px; font-weight: bold; }
+        #startup-countdown { color: #00d2ff; font-size: 1.2em; }
 
         /* SPLASH & LANGUAGE SCREENS */
         #splash-screen {
@@ -88,18 +100,6 @@
         #admin-panel input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
         #admin-panel button { background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; }
 
-        /* COMMERCIAL BREAK SCREEN (BOT BYPASS STEALTH MODE) */
-        #ad-screen {
-            flex-direction: column; justify-content: center; align-items: center; 
-            background: #000; position: fixed; top: 0; left: 0; 
-            width: 100%; height: 100%;
-            /* Bot Bypass Magic: Keep it rendered, but push it behind the app */
-            display: flex;
-            z-index: -100;
-            opacity: 0.01;
-            pointer-events: none;
-        }
-
         /* CUSTOM MEDIA PLAYER INTERFACE */
         #player-screen { background-color: #000; flex-direction: column; height: 100vh; }
         
@@ -113,21 +113,18 @@
             object-fit: fill; transition: object-fit 0.3s ease;
         }
 
-        /* PERMANENT WATERMARK */
         .watermark {
             position: absolute; top: 70px; left: 15px; color: rgba(255, 255, 255, 0.4);
             font-size: 14px; font-weight: bold; z-index: 5; pointer-events: none;
             text-shadow: 1px 1px 2px black;
         }
 
-        /* PREMIUM TOAST NOTIFICATION */
         #toast-msg {
             position: absolute; top: 70px; right: 15px; background: rgba(0, 210, 255, 0.9);
             color: black; padding: 8px 15px; border-radius: 5px; font-weight: bold;
             font-size: 14px; z-index: 30; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
         }
 
-        /* LOADING SPINNER */
         .spinner {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             border: 5px solid rgba(255,255,255,0.2); border-top: 5px solid #00d2ff;
@@ -136,7 +133,6 @@
         }
         @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
 
-        /* DOUBLE TAP RIPPLE EFFECT */
         .seek-ripple {
             position: absolute; top: 50%; transform: translateY(-50%);
             background: rgba(255, 255, 255, 0.15); border-radius: 50%;
@@ -151,7 +147,6 @@
             100% { transform: translateY(-50%) scale(1.8); opacity: 0; }
         }
 
-        /* BIG OVERLAY PLAY BUTTON */
         #big-play-overlay {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background-color: rgba(0, 0, 0, 0.6); border: 2px solid white; border-radius: 50%;
@@ -159,7 +154,6 @@
             align-items: center; cursor: pointer; z-index: 25;
         }
 
-        /* AUTO-HIDING UI WRAPPER */
         #player-ui {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -179,7 +173,6 @@
         }
         #now-playing-title { margin: 0; color: white; font-size: 1.1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; text-shadow: 1px 1px 3px black; }
         
-        /* Custom Control Bar */
         .custom-controls {
             width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 20px 15px 15px 15px;
             box-sizing: border-box; display: flex; flex-direction: column; z-index: 10;
@@ -217,7 +210,19 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <div id="splash-screen" class="app-screen" style="display: flex;">
+    <div id="startup-ad-screen">
+        <h2>Sponsor Message</h2>
+        
+        <div style="width: 300px; height: 250px; background: #111; display: flex; justify-content: center; align-items: center; border-radius: 8px;">
+            <iframe data-aa='2435659' src='https://ad.a-ads.com/2435659/?size=300x250' style='border:0; padding:0; width:300px; height:250px; overflow:hidden; display:block; margin:auto'></iframe>
+        </div>
+
+        <div class="startup-timer-text">
+            Loading FL Tv Telugu in <span id="startup-countdown">12</span>s...
+        </div>
+    </div>
+
+    <div id="splash-screen" class="app-screen">
         <h1>FL Tv Telugu</h1>
         <div class="splash-contact">
             Any issue occurred in the app contact us with<br>
@@ -255,35 +260,14 @@
         <div id="channels-grid"></div>
     </div>
 
-    <div id="ad-screen">
-        <div style="width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; position: absolute; top: 0; box-sizing: border-box;">
-            <span style="color: #ffcc00; font-weight: bold; font-size: 1.1em;">Sponsor Message</span>
-            <span id="ad-timer" style="color: #00d2ff; font-weight: bold; font-size: 1.1em;">Loading in 7s...</span>
-        </div>
-        
-        <div id="ad-container" style="width: 300px; height: 250px; background: #111; display: flex; justify-content: center; align-items: center; border-radius: 8px;">
-            <div id="frame" style="width: 300px;margin: auto;z-index: 99998;height: auto">
-              <iframe data-aa='2435659' src='//ad.a-ads.com/2435659/?size=300x250'
-                                style='border:0; padding:0; width:300px; height:250px; overflow:hidden;display: block;margin: auto'></iframe>
-            </div>
-            </div>
-        
-        <div style="margin-top: 30px; color: #888; text-align: center; font-size: 1.1em; font-weight: bold;">
-            Please wait. Your channel will start automatically.<br><br>దరఖాస్తు లోడ్ అవుతోంది...
-        </div>
-    </div>
-
     <div id="player-screen" class="app-screen">
         <div class="video-container" id="video-container">
-            
             <div class="watermark">@FreeLiveTvTelugu@proton.me</div>
             <div id="toast-msg">Fit to Screen</div>
-
             <div id="seek-left" class="seek-ripple">-10s</div>
             <div id="seek-right" class="seek-ripple">+10s</div>
             <div id="video-spinner" class="spinner"></div>
             <button id="big-play-overlay"></button>
-
             <video id="video-player" playsinline></video>
             
             <div id="player-ui">
@@ -291,18 +275,15 @@
                     <button class="back-btn" tabindex="0" onclick="closePlayer()">⬅</button>
                     <h3 id="now-playing-title">Loading Stream...</h3>
                 </div>
-
                 <div class="custom-controls">
                     <div class="dvr-container">
                         <span class="dvr-time">-60s</span>
                         <input type="range" id="dvr-slider" tabindex="0" min="0" max="60" value="0">
                         <span class="dvr-time" style="color:white; font-weight:bold;">LIVE</span>
                     </div>
-
                     <div class="buttons-row">
                         <button class="play-pause-btn" tabindex="0" id="play-pause-btn" onclick="togglePlay()"></button>
                         <button class="live-badge synced" tabindex="0" id="live-btn" onclick="jumpToLive()">🔴 LIVE</button>
-                        
                         <div class="right-controls">
                             <button class="action-btn" tabindex="0" onclick="toggleScreenSize()">
                                 <svg viewBox="0 0 24 24" width="28" height="28"><path fill="white" d="M19 12h-2v3h-3v2h5v-5zM7 9h3V7H5v5h2V9zm14-6H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16.01H3V4.99h18v14.02z"/></svg>
@@ -314,29 +295,23 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
     <script>
         const GITHUB_USERNAME = "FreeLiveTvTelugu"; 
         const GITHUB_REPO = "Freelivetvtelugu";         
-        // REMOVED FOR SECURITY. The app will securely ask for it when you use the Admin Panel!
-        const GITHUB_TOKEN = ""; 
         const FILE_PATH = "config.json";
         
         let hlsEngine = null; 
         let shakaEngine = null;
         let allChannels = [];
         let isChannelsReady = false; 
-        let adCountdownInterval;
-        let globalSearchTag = ""; // Will hold your tag from GitHub config.json
+        let globalSearchTag = "";
 
-        // CRISP WHITE SVG ICONS
         const SVG_PLAY = '<svg viewBox="0 0 24 24" width="36" height="36"><path fill="white" d="M8 5v14l11-7z"/></svg>';
         const SVG_PAUSE = '<svg viewBox="0 0 24 24" width="36" height="36"><path fill="white" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
 
-        // ALGORITHMIC PHONETIC TRANSLITERATOR
         const charMap = {
             'aa':'ఆ', 'ee':'ఈ', 'oo':'ఊ', 'ai':'ఐ', 'ou':'ఔ', 'au':'ఔ', 'ch':'చ్', 'sh':'ష్', 'th':'త్', 'dh':'ద్', 'ph':'ఫ్', 'bh':'భ్', 'gh':'ఘ్', 'kh':'ఖ్', 'jh':'ఝ్',
             'a':'అ', 'i':'ఇ', 'u':'ఉ', 'e':'ఎ', 'o':'ఒ', 
@@ -361,23 +336,41 @@
             return result.toUpperCase();
         }
 
-        // SILENT BACKGROUND PROCESSING
+        // ==========================================
+        // INITIALIZATION & VERIFICATION COUNTDOWN
+        // ==========================================
         window.onload = () => {
             shaka.polyfill.installAll();
-            
             document.getElementById('play-pause-btn').innerHTML = SVG_PLAY;
             document.getElementById('big-play-overlay').innerHTML = SVG_PLAY;
 
             fetchConfigFromGitHubInBackground();
 
-            setTimeout(() => {
-                document.getElementById('splash-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('splash-screen').style.display = 'none';
-                    document.getElementById('language-screen').style.display = 'flex';
-                    document.querySelector('.lang-btn').focus();
-                }, 500);
-            }, 3000);
+            // Run the 12-second verification ad screen
+            let timeLeft = 12;
+            const countdownEl = document.getElementById('startup-countdown');
+            const startupAdScreen = document.getElementById('startup-ad-screen');
+            const splashScreen = document.getElementById('splash-screen');
+
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                countdownEl.innerText = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    startupAdScreen.style.display = 'none'; 
+                    splashScreen.style.display = 'flex';    
+
+                    setTimeout(() => {
+                        splashScreen.style.opacity = '0';
+                        setTimeout(() => {
+                            splashScreen.style.display = 'none';
+                            document.getElementById('language-screen').style.display = 'flex';
+                            document.querySelector('.lang-btn').focus();
+                        }, 500);
+                    }, 3000);
+                }
+            }, 1000);
         };
 
         async function fetchConfigFromGitHubInBackground() {
@@ -388,9 +381,7 @@
                 const content = decodeURIComponent(escape(atob(data.content)));
                 const config = JSON.parse(content);
                 
-                // Read the search tag directly from your config.json!
                 globalSearchTag = config.searchTarget ? config.searchTarget.toUpperCase() : "";
-                
                 await fetchAndParseM3U(config.playlistUrl);
             } catch (error) {
                 document.getElementById('loading-text').innerText = "Cloud Connection Failed.";
@@ -418,11 +409,9 @@
                         };
                     } else if (line.startsWith('http')) {
                         currentChannel.url = line;
-                        
                         let cleanEng = currentChannel.rawName.replace(/┃TELEGU┃|┃TELUGU┃|┃ENGLISH┃/gi, "").trim();
                         currentChannel.englishName = cleanEng;
                         currentChannel.teluguName = algorithmicTransliterate(cleanEng);
-
                         allChannels.push(currentChannel);
                         currentChannel = {};
                     }
@@ -437,11 +426,7 @@
             uiLanguage = lang; 
             document.getElementById('language-screen').style.display = 'none';
             document.getElementById('main-screen').style.display = 'block';
-            
-            if (uiLanguage === "TELUGU") {
-                document.getElementById('search-bar').placeholder = "ఛానెల్‌లను వెతకండి...";
-            }
-
+            if (uiLanguage === "TELUGU") { document.getElementById('search-bar').placeholder = "ఛానెల్‌లను వెతకండి..."; }
             if (isChannelsReady) { renderGrid(); } 
             else { setTimeout(renderGrid, 1000); }
         }
@@ -449,8 +434,6 @@
         function renderGrid() {
             const grid = document.getElementById('channels-grid');
             grid.innerHTML = '';
-            
-            // Filter using YOUR custom tag from GitHub config.json
             let filteredChannels = allChannels;
             if (globalSearchTag !== "") {
                 filteredChannels = allChannels.filter(ch => {
@@ -472,31 +455,85 @@
                 const card = document.createElement('div');
                 card.className = 'channel-card';
                 card.tabIndex = 0; 
-                
                 let displayName = uiLanguage === "TELUGU" ? ch.teluguName : ch.englishName;
 
                 card.innerHTML = `
                     <img src="${ch.logo}" class="channel-logo" alt="" onerror="this.src='https://via.placeholder.com/150x80/222222/FFFFFF?text=TV'">
                     <div class="channel-name">${displayName}</div>
                 `;
-
-                // Intercept the click to show the Ad Screen first!
-                card.onclick = () => playAdBeforeStream(displayName, ch.url);
+                
+                // Jump straight to the player instantly (Ad is already seen at startup)
+                card.onclick = () => preloadPlayer(displayName, ch.url);
                 grid.appendChild(card);
             });
-
             document.getElementById('search-bar').focus();
         }
 
         // ==========================================
-        // GHOST ADMIN SECURE UPDATER
+        // DUAL-DECODER ENGINE (HYPER-SPEED MPD & M3U)
         // ==========================================
+        async function preloadPlayer(channelName, streamUrl) {
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('player-screen').style.display = 'flex';
+            document.getElementById('now-playing-title').innerText = channelName;
+            playBtn.innerHTML = SVG_PLAY; 
+            dvrSlider.value = 0; 
+            liveBtn.className = "live-badge synced";
+            bigPlayOverlay.style.display = "none";
+            spinner.style.display = "block"; 
+            
+            setTimeout(() => document.getElementById('play-pause-btn').focus(), 100);
+            screenMode = 1;
+            videoElement.style.objectFit = 'fill';
+            resetUiTimer();
+
+            if (hlsEngine) { hlsEngine.destroy(); hlsEngine = null; }
+            if (shakaEngine) { shakaEngine.unload(); shakaEngine.destroy(); shakaEngine = null; }
+            videoElement.src = "";
+
+            if (streamUrl.toLowerCase().includes('.mpd')) {
+                if (shaka.Player.isBrowserSupported()) {
+                    shakaEngine = new shaka.Player(videoElement);
+                    shakaEngine.configure({ 
+                        streaming: { bufferingGoal: 2, rebufferingGoal: 1, bufferBehind: 15, lowLatencyMode: true } 
+                    });
+                    try {
+                        await shakaEngine.load(streamUrl);
+                        jumpToLive(); 
+                        attemptPlay();
+                    } catch (e) { console.error("Shaka failed", e); }
+                }
+            } else {
+                if (Hls.isSupported()) {
+                    hlsEngine = new Hls({ 
+                        maxBufferLength: 3, maxMaxBufferLength: 5, liveSyncDurationCount: 1, 
+                        liveMaxLatencyDurationCount: 2, enableWorker: true, lowLatencyMode: true 
+                    });
+                    hlsEngine.loadSource(streamUrl);
+                    hlsEngine.attachMedia(videoElement);
+                    hlsEngine.on(Hls.Events.MANIFEST_PARSED, function() {
+                        jumpToLive(); 
+                        attemptPlay();
+                    });
+                    hlsEngine.on(Hls.Events.ERROR, function(event, data) {
+                        if (data.fatal) {
+                            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) { hlsEngine.startLoad(); }
+                            else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) { hlsEngine.recoverMediaError(); }
+                        }
+                    });
+                } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+                    videoElement.src = streamUrl; 
+                    attemptPlay();
+                }
+            }
+        }
+
         async function updateGitHubFile() {
             const newUrl = document.getElementById('new-m3u-url').value;
             const statusText = document.getElementById('admin-status');
             if (!newUrl) return;
-
-            // Security Fix: Ask for the token securely!
+            
+            // This is the secure fix! We ask for the token ONLY when you need it.
             const secureToken = prompt("Enter your GitHub Admin Token (ghp_...):");
             if (!secureToken) return;
 
@@ -506,8 +543,6 @@
             try {
                 const getRes = await fetch(url, { headers: { 'Authorization': `token ${secureToken}` } });
                 const getJson = await getRes.json();
-                
-                // Preserves your search target and updates the URL
                 const newConfig = { "playlistUrl": newUrl, "searchTarget": globalSearchTag };
                 const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(newConfig, null, 2))));
 
@@ -528,45 +563,6 @@
             }
         }
 
-        // ==========================================
-        // MONETIZATION (AD ENGINE STEALTH BYPASS)
-        // ==========================================
-        function playAdBeforeStream(channelName, streamUrl) {
-            // Hide the main screen
-            document.getElementById('main-screen').style.display = 'none';
-            
-            const adScreen = document.getElementById('ad-screen');
-            const adTimerText = document.getElementById('ad-timer');
-            
-            // BRING AD TO THE FRONT!
-            adScreen.style.zIndex = "9500";
-            adScreen.style.opacity = "1";
-            adScreen.style.pointerEvents = "auto";
-            
-            let timeLeft = 7;
-            adTimerText.innerText = `Loading in ${timeLeft}s...`;
-            
-            clearInterval(adCountdownInterval);
-            adCountdownInterval = setInterval(() => {
-                timeLeft--;
-                if (timeLeft > 0) {
-                    adTimerText.innerText = `Loading in ${timeLeft}s...`;
-                } else {
-                    clearInterval(adCountdownInterval);
-                    
-                    // PUSH AD BACK TO THE SHADOWS
-                    adScreen.style.zIndex = "-100";
-                    adScreen.style.opacity = "0.01";
-                    adScreen.style.pointerEvents = "none";
-                    
-                    openPlayer(channelName, streamUrl); // Start the video
-                }
-            }, 1000);
-        }
-
-        // ==========================================
-        // ANDROID TV HARDWARE REMOTE CONTROLLER
-        // ==========================================
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 if (document.activeElement && typeof document.activeElement.click === 'function') {
@@ -576,13 +572,9 @@
                     togglePlay(); resetUiTimer();
                 }
             }
-
             if (e.key === 'Escape' || e.key === 'Backspace' || e.keyCode === 10009) {
-                if (document.getElementById('player-screen').style.display === 'flex') {
-                    e.preventDefault(); closePlayer();
-                }
+                if (document.getElementById('player-screen').style.display === 'flex') { e.preventDefault(); closePlayer(); }
             }
-
             if (document.getElementById('player-screen').style.display === 'flex') {
                 if (e.key === 'ArrowLeft') { seekVideo(-10); showRipple('seek-left'); resetUiTimer(); }
                 else if (e.key === 'ArrowRight') { seekVideo(10); showRipple('seek-right'); resetUiTimer(); }
@@ -591,9 +583,6 @@
             }
         });
 
-        // ==========================================
-        // PLAYER LOGIC, UI TIMERS & GESTURES
-        // ==========================================
         const videoElement = document.getElementById('video-player');
         const videoContainer = document.getElementById('video-container');
         const playBtn = document.getElementById('play-pause-btn');
@@ -609,25 +598,17 @@
             playerUi.classList.remove('hidden');
             clearTimeout(uiTimeout);
             uiTimeout = setTimeout(() => {
-                if (!videoElement.paused) {
-                    playerUi.classList.add('hidden');
-                    if(document.activeElement) document.activeElement.blur();
-                }
+                if (!videoElement.paused) { playerUi.classList.add('hidden'); if(document.activeElement) document.activeElement.blur(); }
             }, 2000);
         }
 
         videoContainer.addEventListener('click', function(e) {
-            if (e.target.closest('.custom-controls') || e.target.closest('.player-header') || e.target.closest('#big-play-overlay') || e.target.closest('.watermark')) {
-                return;
-            }
-
+            if (e.target.closest('.custom-controls') || e.target.closest('.player-header') || e.target.closest('#big-play-overlay') || e.target.closest('.watermark')) return;
             const currentTime = new Date().getTime();
             const tapDelay = currentTime - lastTapTime;
-
             if (tapDelay < 300 && tapDelay > 0) {
                 const rect = this.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
-                
                 if (clickX < rect.width / 2) { seekVideo(-10); showRipple('seek-left'); }
                 else { seekVideo(10); showRipple('seek-right'); }
                 lastTapTime = 0;
@@ -640,10 +621,8 @@
 
         function showRipple(elementId) {
             const ripple = document.getElementById(elementId);
-            ripple.style.display = 'flex';
-            ripple.style.animation = 'none';
-            void ripple.offsetWidth; 
-            ripple.style.animation = 'rippleAnim 0.5s ease-out';
+            ripple.style.display = 'flex'; ripple.style.animation = 'none';
+            void ripple.offsetWidth; ripple.style.animation = 'rippleAnim 0.5s ease-out';
             setTimeout(() => { ripple.style.display = 'none'; }, 500);
         }
 
@@ -655,102 +634,37 @@
         function toggleScreenSize() {
             screenMode = (screenMode + 1) % 3;
             videoElement.style.objectFit = screenStyles[screenMode];
-            
             const toast = document.getElementById('toast-msg');
-            toast.innerText = screenNames[screenMode];
-            toast.style.opacity = 1;
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => { toast.style.opacity = 0; }, 2000);
-            
+            toast.innerText = screenNames[screenMode]; toast.style.opacity = 1;
+            clearTimeout(toastTimeout); toastTimeout = setTimeout(() => { toast.style.opacity = 0; }, 2000);
             resetUiTimer();
         }
 
         videoElement.addEventListener('waiting', () => spinner.style.display = 'block');
         videoElement.addEventListener('playing', () => spinner.style.display = 'none');
         videoElement.addEventListener('canplay', () => spinner.style.display = 'none');
-
         bigPlayOverlay.addEventListener('click', togglePlay);
 
         function attemptPlay() {
             let playPromise = videoElement.play();
             if (playPromise !== undefined) {
-                playPromise.then(_ => {
-                    playBtn.innerHTML = SVG_PAUSE;
-                    bigPlayOverlay.style.display = "none";
-                    resetUiTimer();
-                }).catch(error => {
-                    playBtn.innerHTML = SVG_PLAY;
-                    bigPlayOverlay.style.display = "flex"; 
-                });
-            }
-        }
-
-        async function openPlayer(channelName, streamUrl) {
-            document.getElementById('player-screen').style.display = 'flex';
-            document.getElementById('now-playing-title').innerText = channelName;
-            playBtn.innerHTML = SVG_PLAY; 
-            dvrSlider.value = 0; 
-            liveBtn.className = "live-badge synced";
-            bigPlayOverlay.style.display = "none";
-            spinner.style.display = "block"; 
-            
-            setTimeout(() => document.getElementById('play-pause-btn').focus(), 100);
-            
-            screenMode = 1;
-            videoElement.style.objectFit = 'fill';
-            resetUiTimer();
-
-            if (streamUrl.includes('.mpd')) {
-                if (shaka.Player.isBrowserSupported()) {
-                    shakaEngine = new shaka.Player(videoElement);
-                    shakaEngine.configure({ streaming: { bufferingGoal: 10, rebufferingGoal: 2, bufferBehind: 60 } });
-                    try {
-                        await shakaEngine.load(streamUrl);
-                        jumpToLive(); attemptPlay();
-                    } catch (e) { console.error("Shaka failed", e); }
-                }
-            } 
-            else {
-                if (Hls.isSupported()) {
-                    hlsEngine = new Hls({ 
-                        maxBufferLength: 15, backBufferLength: 60, liveSyncDurationCount: 3, enableWorker: true
-                    });
-                    
-                    hlsEngine.loadSource(streamUrl);
-                    hlsEngine.attachMedia(videoElement);
-                    hlsEngine.on(Hls.Events.MANIFEST_PARSED, function() {
-                        jumpToLive(); attemptPlay();
-                    });
-                    
-                    hlsEngine.on(Hls.Events.ERROR, function(event, data) {
-                        if (data.fatal) {
-                            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) { hlsEngine.startLoad(); } 
-                            else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) { hlsEngine.recoverMediaError(); }
-                        }
-                    });
-
-                } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-                    videoElement.src = streamUrl; attemptPlay();
-                }
+                playPromise.then(_ => { playBtn.innerHTML = SVG_PAUSE; bigPlayOverlay.style.display = "none"; resetUiTimer(); })
+                .catch(error => { playBtn.innerHTML = SVG_PLAY; bigPlayOverlay.style.display = "flex"; });
             }
         }
 
         function closePlayer() {
-            videoElement.pause();
-            videoElement.src = "";
-            bigPlayOverlay.style.display = "none";
-            spinner.style.display = "none";
+            videoElement.pause(); videoElement.src = "";
+            bigPlayOverlay.style.display = "none"; spinner.style.display = "none";
             if (hlsEngine) { hlsEngine.destroy(); hlsEngine = null; }
             if (shakaEngine) { shakaEngine.unload(); shakaEngine.destroy(); shakaEngine = null; }
-
             document.getElementById('player-screen').style.display = 'none';
             document.getElementById('main-screen').style.display = 'block';
-            
             document.getElementById('search-bar').focus();
         }
 
         function togglePlay() {
-            if (videoElement.paused) { attemptPlay(); } 
+            if (videoElement.paused) { attemptPlay(); }
             else { videoElement.pause(); playBtn.innerHTML = SVG_PLAY; bigPlayOverlay.style.display = "flex"; playerUi.classList.remove('hidden'); }
         }
 
@@ -768,24 +682,19 @@
             if (videoElement.seekable.length > 0) {
                 let liveEdge = videoElement.seekable.end(videoElement.seekable.length - 1);
                 let targetTime = videoElement.currentTime + offset;
-                
                 if (targetTime > liveEdge) targetTime = liveEdge;
                 videoElement.currentTime = targetTime;
-                
                 let diff = Math.round(liveEdge - targetTime);
                 dvrSlider.value = Math.min(Math.max(diff, 0), 60);
-                
-                if(diff < 5) { liveBtn.className = "live-badge synced"; } 
+                if(diff < 5) { liveBtn.className = "live-badge synced"; }
                 else { liveBtn.className = "live-badge"; }
                 resetUiTimer();
             }
         }
 
         dvrSlider.addEventListener('input', (e) => {
-            resetUiTimer(); 
-            let secondsToRewind = parseInt(e.target.value);
-            
-            if (secondsToRewind === 0) { jumpToLive(); } 
+            resetUiTimer(); let secondsToRewind = parseInt(e.target.value);
+            if (secondsToRewind === 0) { jumpToLive(); }
             else {
                 liveBtn.className = "live-badge";
                 if (videoElement.seekable.length > 0) {
@@ -798,9 +707,7 @@
         videoElement.addEventListener('timeupdate', () => {
             if (videoElement.seekable.length > 0) {
                 let liveEdge = videoElement.seekable.end(videoElement.seekable.length - 1);
-                let current = videoElement.currentTime;
-                let diff = liveEdge - current;
-                
+                let diff = liveEdge - videoElement.currentTime;
                 if (diff < 5 && dvrSlider.value == 0) { liveBtn.className = "live-badge synced"; }
             }
         });
@@ -810,8 +717,7 @@
                 let liveEdge = videoElement.seekable.end(videoElement.seekable.length - 1);
                 videoElement.currentTime = liveEdge;
             }
-            dvrSlider.value = 0;
-            liveBtn.className = "live-badge synced";
+            dvrSlider.value = 0; liveBtn.className = "live-badge synced";
             if(videoElement.paused) attemptPlay();
         }
 
@@ -819,8 +725,7 @@
             const query = e.target.value.toLowerCase();
             if (query === "#ghost") {
                 document.getElementById('admin-panel').style.display = "block";
-                e.target.value = "";
-                return;
+                e.target.value = ""; return;
             }
             const cards = document.querySelectorAll('.channel-card');
             cards.forEach(card => {
@@ -828,7 +733,6 @@
                 card.style.display = name.includes(query) ? "flex" : "none";
             });
         });
-
     </script>
 </body>
 </html>
