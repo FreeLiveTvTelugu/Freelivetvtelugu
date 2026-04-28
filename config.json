@@ -1,10 +1,12 @@
 {
-  "playlistUrl": "https://local.07live.workers.dev/playlist.m3u?user=999&pass=999",
-  "searchTarget": [
-    "telugu",
-    "maa",
-    "zee cinemalu",
-    "gemini",
-    "star sports Telugu"
+  "playlists": [
+    {
+      "url": "https://kliv.in/jopp5",
+      "searchTags": ["telugu", "maa", "zee cinemalu", "gemini"]
+    },
+    {
+      "url": "https://local.07live.workers.dev/playlist.m3u?user=999&pass=999",
+      "searchTags": ["star sports telugu", "cricket"]
+    }
   ]
 }
