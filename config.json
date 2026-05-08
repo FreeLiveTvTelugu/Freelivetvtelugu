@@ -2,19 +2,17 @@
   "playlists": [
     {
       "url": "https://ranapkbd.site/RANAPK33n/TVD/tvd.m3u",
-      "searchTags": [
-        "┃TELEGU┃"
-      ]
+      "searchTags": []
     },
     {
       "url": "https://raw.githubusercontent.com/FreeLiveTvTelugu/Freelivetvtelugu/main/movies.m3u",
       "searchTags": []
     },
     {
-      "url": "http://premimum.online/get.php?username=johannes&password=johannes123&type=m3u&output=m3u8",
-      "searchTags": [
-        "TELUGU"
-      ]
+      "server": "http://premimum.online",
+      "user": "johannes",
+      "password": "johannes123",
+      "searchTags": ["telugu"]
     }
   ]
 }
