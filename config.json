@@ -9,6 +9,10 @@
     {
       "url": "https://raw.githubusercontent.com/FreeLiveTvTelugu/Freelivetvtelugu/main/movies.m3u",
       "searchTags": []
+    },
+    {
+      "url": "http://premimum.online/get.php?username=johannes&password=johannes123&type=m3u&output=m3u8",
+      "searchTags": [telugu]
     }
   ]
 }
