@@ -1,11 +1,9 @@
 {
   "playlists": [
     {
-      "server": "http://premimum.online",
-      "user": "johannes",
-      "password": "johannes123",
+      "url": "http://premimum.online/get.php?username=johannes&password=johannes123&type=m3u&output=ts",
       "searchTags": [
-        "telugu"
+        "TELUGU"
       ]
     }
   ]
