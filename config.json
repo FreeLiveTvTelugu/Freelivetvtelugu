@@ -1,9 +1,12 @@
 {
   "playlists": [
     {
-      "url": "https://raw.githubusercontent.com/FreeLiveTvTelugu/Freelivetvtelugu/main/Live_TV_Only_Telugu.m3u",
-      "searchTags": []
+      "server": "http://premimum.online",
+      "user": "johannes",
+      "password": "johannes123",
+      "searchTags": [
+        "TELUGU"
+      ]
     }
   ]
 }
- 
